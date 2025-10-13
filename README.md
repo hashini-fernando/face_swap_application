@@ -56,4 +56,5 @@ streamlit run new.py
 
 Project Flow
 
+<img width="1905" height="951" alt="image" src="https://github.com/user-attachments/assets/ea49e64b-6fee-45e3-8b17-ff23843c77a0" />
 
