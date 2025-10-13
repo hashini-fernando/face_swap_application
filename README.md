@@ -53,3 +53,7 @@ Running the App
 streamlit run new.py
 
 ```
+
+Project Flow
+
+
