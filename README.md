@@ -66,7 +66,9 @@ streamlit run new.py
 
 <img width="1902" height="952" alt="image (2)" src="https://github.com/user-attachments/assets/ef3d34af-97c5-438d-8e57-8c3ea44d78f0" />
 
-### Metrice
+### Metrics
+
+<img width="1920" height="881" alt="image" src="https://github.com/user-attachments/assets/bb3f40e1-b0e2-45f5-908a-83bf42da7977" />
 
 
 
