@@ -54,7 +54,21 @@ streamlit run new.py
 
 ```
 
-Project Flow
+### Project Flow
 
-<img width="1905" height="951" alt="image" src="https://github.com/user-attachments/assets/ea49e64b-6fee-45e3-8b17-ff23843c77a0" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/6b5912bb-9f01-4da1-8b9d-e2dad2693dea" />
+
+### Face swapping appilication dashboard screen shots
+
+<img width="1920" height="924" alt="image (1)" src="https://github.com/user-attachments/assets/120d5202-6170-4d8c-9181-d37c1ccd4d5a" />
+
+<img width="1910" height="895" alt="image (3)" src="https://github.com/user-attachments/assets/6c7e142c-7633-492c-aba7-3cfa8e3c4bcd" />
+
+<img width="1902" height="952" alt="image (2)" src="https://github.com/user-attachments/assets/ef3d34af-97c5-438d-8e57-8c3ea44d78f0" />
+
+### Metrice
+
+
+
+
 
