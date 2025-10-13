@@ -7,7 +7,9 @@ from PIL import Image
 import io
 import math
 from datetime import datetime
-
+from skimage.metrics import structural_similarity as ssim
+from math import log10
+from sklearn.metrics.pairwise import cosine_similarity
 # ---------------------------
 # Page configuration + Enhanced styles
 # ---------------------------
@@ -482,7 +484,30 @@ def compute_pose_metrics(face_obj, target_obj):
         'angle_compatibility_score': compatibility['score'],
         'warnings': compatibility['warnings']
     }
+def compute_psnr(img1, img2):
+    """Compute PSNR between two images"""
+    mse = np.mean((img1 - img2) ** 2)
+    if mse == 0:
+        return float('inf')
+    max_pixel = 255.0
+    return 20 * log10(max_pixel / np.sqrt(mse))
 
+def compute_ssim(img1, img2):
+    """Compute SSIM between two RGB images"""
+    img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    score, _ = ssim(img1_gray, img2_gray, full=True)
+    return score
+
+def compute_identity_similarity(app, img1, img2):
+    """Compute cosine similarity between face embeddings"""
+    faces1 = app.get(img1)
+    faces2 = app.get(img2)
+    if not faces1 or not faces2:
+        return None
+    emb1 = faces1[0].normed_embedding.reshape(1, -1)
+    emb2 = faces2[0].normed_embedding.reshape(1, -1)
+    return cosine_similarity(emb1, emb2)[0][0]
 # ---------------------------
 # Sidebar Configuration
 # ---------------------------
@@ -606,7 +631,7 @@ with col3:
             status_text.text("🎯 Analyzing angles...")
             progress_bar.progress(50)
             
-            status_text.text("✨ Swapping faces...")
+            status_text.text(" Swapping faces...")
             result, intermediates, proc_time = perform_multi_angle_face_swap(
                 st.session_state.face_image, 
                 st.session_state.target_image,
@@ -689,14 +714,35 @@ if st.session_state.swapped_image is not None:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         face_count = len(face_faces) if face_faces else 0
         target_count = len(target_faces) if target_faces else 0
-        st.metric("👤 Faces Detected", f"{face_count} → {target_count}")
+        st.metric("Faces Detected", f"{face_count} → {target_count}")
         st.markdown('</div>', unsafe_allow_html=True)
     
     with metric_cols[3]:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         quality_score = 85 if detection_rate == 100 else 70
-        st.metric("⭐ Quality Score", f"{quality_score}%")
+        st.metric(" Quality Score", f"{quality_score}%")
         st.markdown('</div>', unsafe_allow_html=True)
+    with metric_cols[2]:
+        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+        swapped_cv2 = to_bgr(st.session_state.swapped_image)
+        ssim_val = compute_ssim(target_cv2, swapped_cv2)
+        st.metric("SSIM", f"{ssim_val:.3f}")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with metric_cols[3]:
+        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+        psnr_val = compute_psnr(target_cv2, swapped_cv2)
+        st.metric("PSNR", f"{psnr_val:.2f} dB")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # Identity similarity (add below the above metrics)
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    identity_sim = compute_identity_similarity(app, face_cv2, swapped_cv2)
+    if identity_sim is not None:
+        st.metric("Identity Similarity", f"{identity_sim:.3f}")
+    else:
+        st.metric("Identity Similarity", "N/A")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Detailed angle analysis
     if face_faces and target_faces and pose_metrics:
